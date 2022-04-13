@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-app-items-api"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-997gnh6k3l0y"
+s3_prefix = "sam-app-items-api"
+region = "eu-west-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = []

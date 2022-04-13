@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  product-api
+
+  Sample SAM Template for product-api
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  CreateProductFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/create_items/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        CreateItem:
+          Type: Api
+          Properties:
+            Path: /items
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+  ListItemsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/return_items/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        ListProduct:
+          Type: Api
+          Properties:
+            Path: /items
+            Method: get
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+  UpdateItemFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/update_items/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        CreateItem:
+          Type: Api
+          Properties:
+            Path: /items/{id}
+            Method: put
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+  ItemsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: "Items"
+      AttributeDefinitions:
+        - AttributeName: "id"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "id"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "1"
+        WriteCapacityUnits: "1"
+  DeleteItemsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/delete_items/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Events:
+        DeleteItems:
+          Type: Api
+          Properties:
+            Path: /items/{id}
+            Method: delete
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ItemsTable
+Outputs:
+  ItemApi:
+      Description: "API Gateway Items Endpoint"
+      Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
